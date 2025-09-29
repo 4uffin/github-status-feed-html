@@ -3,41 +3,59 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>GitHub Status Feed — Compact Tooltip + Learn More</title>
+<title>GitHub Status Feed — tweaks</title>
 
-<!-- twemoji (used for fallback/twemoji style) -->
+<!-- twemoji for emoji fallback -->
 <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js" crossorigin="anonymous"></script>
 
 <style>
 :root{
   --bg:#0d1117; --fg:#c9d1d9; --card:#0b1115; --accent:#58a6ff;
-  --muted: rgba(255,255,255,0.6); --size:13px; --max-content-width:900px;
-  --feed-height-desktop: calc(100vh - 200px); --radius:10px; --gap:10px;
-  --emoji-size:18px;
-  --select-caret: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7l5 5 5-5' stroke='%23c9d1d9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --muted: rgba(255,255,255,0.6);
+  --size:13px; --max-content-width:1200px; --radius:10px; --gap:10px;
+  --emoji-scale: 1.45;
+  --emoji-size: calc(var(--size) * var(--emoji-scale));
+  --select-caret-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7l5 5 5-5' stroke='%23c9d1d9' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;font-size:var(--size);
-  -webkit-font-smoothing:antialiased;}
-.app{max-width:var(--max-content-width);margin:18px auto;padding:12px;}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  font-size:var(--size);-webkit-font-smoothing:antialiased;
+}
+.app{max-width:var(--max-content-width);margin:18px auto;padding:12px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;
   position:sticky;top:0;background:linear-gradient(180deg,rgba(13,17,23,0.98),rgba(13,17,23,0.95));
   padding:10px 12px;border-radius:var(--radius);z-index:60;backdrop-filter:blur(6px);
-  box-shadow:0 6px 18px rgba(0,0,0,0.45);}
+  box-shadow:0 6px 18px rgba(0,0,0,0.45)}
 header h1{margin:0;font-size:1.05rem}
 .controls{display:flex;gap:8px;align-items:center}
 button,input,select{padding:8px 10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);
   color:inherit;font-size:0.95rem;min-height:40px}
 button{cursor:pointer} button:disabled{opacity:0.55;cursor:default}
 .top-note{margin-top:10px;color:var(--muted);font-size:0.92rem}
-.composer{position:sticky;top:64px;z-index:50;display:flex;gap:8px;align-items:center;margin-top:10px;
+
+/* composer: responsive */
+.composer{
+  position:sticky;top:64px;z-index:50;display:flex;gap:8px;align-items:center;margin-top:10px;
   padding:8px;border-radius:8px;background:linear-gradient(180deg,rgba(11,17,21,0.6),rgba(11,17,21,0.4));
-  backdrop-filter:blur(4px)} .composer input{flex:1;min-width:0}
-.layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:12px}
+  backdrop-filter:blur(4px);max-width:100%;min-height:48px;
+}
+.composer .composer-left{display:flex;gap:8px;flex:1;min-width:0;align-items:center}
+.composer input{flex:1;min-width:0}
+.composer button{flex:0 0 auto}
+
+/* layout and feed container */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:14px;margin-top:12px}
 .feed-wrap{display:flex;flex-direction:column;gap:8px}
-.feed{padding:6px;display:flex;flex-direction:column;gap:var(--gap);
-  max-height:var(--feed-height-desktop);overflow-y:auto;scroll-behavior:smooth}
+.feed{
+  padding:6px;display:flex;flex-direction:column;gap:var(--gap);
+  overflow-y:auto;scroll-behavior:smooth;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* panel/card */
 .panel{
   background:rgba(255,255,255,0.02);
   padding:12px;border-radius:var(--radius);min-width:220px;
@@ -47,7 +65,7 @@ button{cursor:pointer} button:disabled{opacity:0.55;cursor:default}
 .card{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.45);
   display:flex;flex-direction:column;gap:8px;position:relative;transition:transform 160ms ease,box-shadow 160ms ease}
 .meta-row{display:flex;gap:8px;align-items:center;justify-content:space-between}
-.meta-left{display:flex;gap:10px;align-items:center}
+.meta-left{display:flex;gap:10px;align-items:center;min-width:0}
 .meta-right{display:flex;gap:8px;align-items:center}
 .avatar{width:40px;height:40px;border-radius:8px;flex:0 0 auto;object-fit:cover}
 .user-link{display:inline-flex;flex-direction:column;text-decoration:none;color:inherit}
@@ -55,68 +73,117 @@ button{cursor:pointer} button:disabled{opacity:0.55;cursor:default}
 .name-row{display:flex;flex-direction:column;margin:0}
 .display-name{font-weight:700;line-height:1}
 .login{font-size:0.9rem;color:var(--muted);line-height:1}
-.status{white-space:pre-wrap;line-height:1.4;font-size:0.98rem;word-break:break-word}
+.status{white-space:pre-wrap;line-height:1.35;font-size:0.98rem;word-break:break-word}
 .no-status{color:var(--muted)}
+/* removed .badge.new usage — still keep .badge class if needed */
 .badge{background:rgba(88,166,255,0.12);color:var(--accent);padding:4px 8px;border-radius:999px;font-size:0.78rem;font-weight:600}
-.badge.new{background:linear-gradient(90deg,rgba(88,166,255,0.14),rgba(88,166,255,0.06));box-shadow:0 4px 12px rgba(88,166,255,0.06)}
-.timestamp{font-size:0.78rem;color:var(--muted)}
 .warn{background:#4a1b1b;padding:10px;border-radius:8px;color:#ffd6d6;margin-top:10px}
 .muted{color:var(--muted)}
 
-/* selects */
+/* ensure inputs/selects inside flex don't overflow */
 .panel select,
 .panel input,
-.panel button { width:100%; min-width:0; box-sizing:border-box; }
-.panel select {
-  -webkit-appearance: none; -moz-appearance: none; appearance: none;
-  background-image: var(--select-caret); background-repeat: no-repeat;
-  background-position: right 12px center; padding-right: 36px; z-index:80;
+.panel button,
+.composer input,
+.composer button { width:100%; min-width:0; box-sizing:border-box; }
+
+/* SELECT caret */
+.select-wrap{position:relative;display:block}
+.select-wrap select{
+  -webkit-appearance:none; -moz-appearance:none; appearance:none;
+  padding-right:36px;
+}
+.select-wrap::after{
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width:14px; height:14px;
+  background-image: var(--select-caret-svg);
+  background-repeat:no-repeat;
+  pointer-events:none;
+  opacity:0.98;
 }
 
-/* Tooltip */
-.tooltip-wrapper{ display:inline-flex; align-items:center; gap:8px; position:relative; }
-.info-btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:28px; height:28px; border-radius:6px; background:rgba(255,255,255,0.02);
-  border:none; color:var(--muted); cursor:pointer;
-}
-.info-btn:focus{ outline:2px solid rgba(88,166,255,0.16) }
-.tooltip{
-  position:absolute; right:0; top:calc(100% + 8px); transform-origin: top right;
-  background: #0b1115; color: var(--fg); border: 1px solid rgba(255,255,255,0.04);
-  padding:10px; border-radius:10px; width: 260px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-  font-size:0.9rem; z-index:120; display:none;
-}
-.tooltip.visible{ display:block; }
-.tooltip::before{ content:""; position:absolute; top:-6px; right:12px; width:10px; height:10px; transform:rotate(45deg); background: #0b1115; border-left:1px solid rgba(255,255,255,0.04); border-top:1px solid rgba(255,255,255,0.04); }
+/* Inline helper text for remember token (instead of popup tooltip) */
+.remember-helper{font-size:0.88rem;color:var(--muted);margin-top:6px;line-height:1.2}
+.remember-helper a{color:var(--accent);text-decoration:none}
 
-/* emoji */
-.emoji-img{ height: var(--emoji-size); width:auto; display:inline-block; vertical-align:-0.12em; margin-right:0.18em; margin-left:0.02em; line-height:1; }
+/* Newest-first control styled to match Jump button exactly */
+/* Hide the native checkbox input visually but keep it accessible */
+.sort-control{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;           /* match button padding */
+  border-radius:8px;
+  background:rgba(255,255,255,0.03);
+  min-height:40px;            /* match button min-height */
+  cursor:pointer;
+  user-select:none;
+  border: none;
+}
+.sort-control .visually-hidden-checkbox{
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  white-space: nowrap !important;
+}
+
+/* Emoji sizing/alignment */
+.emoji-img{
+  height: 1em;
+  max-height: var(--emoji-size);
+  width: auto;
+  display:inline-block;
+  vertical-align:-0.12em;
+  margin-right:0.18em;
+  margin-left:0.02em;
+  line-height:1;
+  object-fit:contain;
+  pointer-events:none;
+}
 .emoji-img.shortcode{ border-radius:3px; }
 
-/* highlight */
-@keyframes card-highlight{0%{box-shadow:0 0 0 8px rgba(88,166,255,0.16);transform:translateY(-2px)}60%{box-shadow:0 0 0 2px rgba(88,166,255,0.10);transform:translateY(0)}100%{box-shadow:none;transform:translateY(0)}}
-.highlight{animation:card-highlight 900ms ease forwards;outline:2px solid rgba(88,166,255,0.05)}
-@keyframes new-pulse{0%{box-shadow:0 0 0 0 rgba(88,166,255,0.06)}60%{box-shadow:0 10px 30px rgba(88,166,255,0.04)}100%{box-shadow:none}}
-.new-pulse{animation:new-pulse 800ms ease}
+/* focus-visible & highlight */
+:focus{ outline:none; }
+:focus-visible{ outline: 3px solid rgba(88,166,255,0.12); outline-offset:3px; border-radius:6px; }
 
+@keyframes card-highlight{0%{box-shadow:0 0 0 6px rgba(88,166,255,0.12);transform:translateY(-1px)}60%{box-shadow:0 0 0 1px rgba(88,166,255,0.06);transform:translateY(0)}100%{box-shadow:none;transform:translateY(0)}}
+.highlight{animation:card-highlight 720ms cubic-bezier(.2,.9,.3,1) forwards;outline:2px solid rgba(88,166,255,0.04)}
+@keyframes new-pulse{0%{box-shadow:0 0 0 0 rgba(88,166,255,0.04)}60%{box-shadow:0 8px 20px rgba(88,166,255,0.03)}100%{box-shadow:none}}
+.new-pulse{animation:new-pulse 700ms ease}
+
+.card:active{ transform: translateY(0.5px); }
+
+/* responsive */
 @media (max-width:900px){
   .app{padding:10px;margin:8px}
   header{flex-direction:column;align-items:stretch;gap:8px;padding:12px}
-  .composer{position:static;top:auto}
+  .composer{position:static;top:auto;flex-direction:column;align-items:stretch}
+  .composer .composer-left{flex-direction:column;gap:6px}
   .layout{grid-template-columns:1fr}
   .panel{order:-1;width:100%;margin-bottom:8px}
   .feed{max-height:none;overflow-y:visible;padding:6px}
   button,input,select{min-height:44px;font-size:1rem}
   .card{padding:14px;border-radius:14px}
-  .tooltip{right:auto; left:0; width:calc(100% - 10px);}
+  .select-wrap::after{ right: 8px; }
+}
+@media (min-width:1200px){ .app{max-width:1200px} }
+@media (prefers-reduced-motion: reduce){
+  .highlight, .new-pulse, .card { animation: none !important; transition: none !important; }
 }
 .hidden{display:none}
+.kv{color:var(--muted);font-size:0.9rem}
 </style>
 </head>
 <body>
-<div class="app" role="application" aria-label="GitHub Status Feed">
-  <header>
+<div class="app" role="application" aria-label="GitHub Status Feed — tweaks">
+  <header id="pageHeader">
     <div style="display:flex;flex-direction:column;gap:6px">
       <h1>GitHub Status Feed</h1>
       <div class="top-note small">Paste a GitHub Personal Access Token for higher limits. Don't publish it.</div>
@@ -127,11 +194,15 @@ button{cursor:pointer} button:disabled{opacity:0.55;cursor:default}
     </div>
   </header>
 
-  <div class="composer" role="region" aria-label="jump composer">
-    <input id="composerInput" type="text" placeholder="Paste username (e.g. octocat) and press Jump" />
-    <button id="jumpBtn">Jump</button>
-    <label style="display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02)">
-      <input id="sortToggle" type="checkbox" />
+  <div class="composer" id="composer" role="region" aria-label="jump composer">
+    <div class="composer-left">
+      <input id="composerInput" type="text" placeholder="Paste username (e.g. octocat) and press Jump" aria-label="Username to jump to" />
+      <div style="display:flex;gap:8px"><button id="jumpBtn">Jump</button></div>
+    </div>
+
+    <!-- Sort control matches Jump button size. Checkbox kept but visually hidden for accessibility -->
+    <label class="sort-control" id="sortControlLabel" title="Toggle newest/oldest" tabindex="0">
+      <input id="sortToggle" class="visually-hidden-checkbox" type="checkbox" aria-label="Newest first toggle" />
       <span id="sortLabel">Newest first</span>
     </label>
   </div>
@@ -141,43 +212,33 @@ button{cursor:pointer} button:disabled{opacity:0.55;cursor:default}
       <div id="feed" class="feed" role="list" aria-label="Status feed"></div>
     </div>
 
-    <aside class="panel" aria-label="Settings panel">
+    <aside class="panel" id="settingsPanel" aria-label="Settings panel" aria-labelledby="settingsTitle">
       <div style="display:flex;flex-direction:column;gap:8px">
-        <label class="small">GitHub Token (optional):</label>
-        <input id="tokenInput" type="text" placeholder="Paste PAT here (saved locally if 'Remember' checked)" />
+        <h2 id="settingsTitle" style="margin:0;font-size:1rem">Settings</h2>
 
-        <!-- Remember token + compact tooltip with Learn more -->
-        <div style="display:flex;align-items:center;gap:8px">
-          <label style="display:flex;align-items:center;gap:8px" id="rememberLabel">
-            <input id="rememberToken" type="checkbox" />
+        <label class="small">GitHub Token (optional):</label>
+        <input id="tokenInput" type="text" placeholder="Paste PAT here (saved locally if 'Remember' checked)" aria-label="GitHub Personal Access Token" />
+
+        <!-- Remember + inline helper (alignment improved) -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="display:flex;align-items:center;gap:8px">
+            <input id="rememberToken" type="checkbox" style="width:18px;height:18px" />
             <span class="small">Remember token</span>
           </label>
-
-          <div class="tooltip-wrapper" style="margin-left:4px">
-            <button id="infoBtn" class="info-btn" aria-haspopup="true" aria-controls="rememberTip" aria-expanded="false" aria-label="About remembering tokens">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm.75 6.5a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0zM11 11h2v5h-2v-5z" fill="#c9d1d9"/>
-              </svg>
-            </button>
-            <div id="rememberTip" role="tooltip" class="tooltip" aria-hidden="true">
-              <strong>Remember token</strong>
-              <div style="margin-top:6px;color:var(--muted);font-size:0.9rem;line-height:1.25">
-                Stores the token in your browser. Only enable on private devices.
-                <div style="margin-top:6px"><a id="learnMore" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens" target="_blank" rel="noopener noreferrer">Learn more</a></div>
-              </div>
-            </div>
-          </div>
+          <div class="remember-helper">Stores the token in your browser — enable only on private devices. <a id="learnMore" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens" target="_blank" rel="noopener noreferrer">Learn more</a></div>
         </div>
 
         <label class="small">Users to fetch:
-          <input id="countInput" type="number" min="1" max="500" value="50" />
+          <input id="countInput" type="number" min="1" max="500" value="50" aria-label="Number of users to fetch" />
         </label>
 
         <label class="small">Query type:
-          <select id="queryType">
-            <option value="search">Search first N users</option>
-            <option value="fromList">Fetch by username list</option>
-          </select>
+          <div class="select-wrap">
+            <select id="queryType" aria-label="Query type">
+              <option value="search">Search first N users</option>
+              <option value="fromList">Fetch by username list</option>
+            </select>
+          </div>
         </label>
 
         <label id="userListLabel" class="small hidden">Comma-separated usernames:
@@ -185,10 +246,12 @@ button{cursor:pointer} button:disabled{opacity:0.55;cursor:default}
         </label>
 
         <label class="small">Emoji style:
-          <select id="emojiStyle">
-            <option value="twemoji">Twemoji (consistent images)</option>
-            <option value="github">GitHub images (shortcodes & mapped unicode)</option>
-          </select>
+          <div class="select-wrap">
+            <select id="emojiStyle" aria-label="Emoji style">
+              <option value="twemoji">Twemoji (consistent images)</option>
+              <option value="github">GitHub images (shortcodes & mapped unicode)</option>
+            </select>
+          </div>
         </label>
 
         <label class="small">Font size:
@@ -210,7 +273,7 @@ button{cursor:pointer} button:disabled{opacity:0.55;cursor:default}
 </div>
 
 <script>
-/* Compact tooltip + Learn more link (points to GitHub docs) */
+/* Keep the previous app logic; trimmed timestamps + removed New badges + UI tweaks */
 
 /* Storage keys */
 const STORAGE_KEY = 'gh_client_feed_v1';
@@ -220,6 +283,8 @@ const EMOJI_MAP_KEY = 'gh_client_emojis_v1';
 
 /* Elements */
 const feedEl = document.getElementById('feed');
+const headerEl = document.getElementById('pageHeader');
+const composerEl = document.getElementById('composer');
 const refreshBtn = document.getElementById('refreshBtn');
 const clearTokenBtn = document.getElementById('clearTokenBtn');
 const tokenInput = document.getElementById('tokenInput');
@@ -238,41 +303,40 @@ const jumpBtn = document.getElementById('jumpBtn');
 const sortToggle = document.getElementById('sortToggle');
 const sortLabel = document.getElementById('sortLabel');
 const emojiStyleSelect = document.getElementById('emojiStyle');
-
-const infoBtn = document.getElementById('infoBtn');
-const rememberTip = document.getElementById('rememberTip');
+const sortControlLabel = document.getElementById('sortControlLabel');
 
 let currentUsers = [];
 let userMap = new Map();
 let observer = null;
 let emojiMap = null;
+let emojiMapFailedShown = false;
+let _highlightTimer = null;
 
-/* Small emoji mapping (expanded for common emoji) */
+/* small mapping */
 const CODEPOINT_TO_SHORTCODE = {
-  "1f600":"grinning","1f601":"grin","1f602":"joy","1f603":"smiley","1f604":"smile",
-  "1f605":"sweat_smile","1f606":"laughing","1f607":"innocent","1f609":"wink","1f60a":"blush",
-  "1f60b":"yum","1f60e":"sunglasses","1f60d":"heart_eyes","1f618":"kissing_heart","263a":"relaxed",
-  "1f642":"slight_smile","1f643":"upside_down_face","1f914":"thinking","1f62e":"open_mouth","1f622":"cry",
-  "1f62d":"sob","1f92a":"zany_face","1f610":"neutral_face","1f611":"expressionless","1f62a":"sleepy",
-  "1f634":"sleeping","1f473":"man_with_turban","1f468":"man","1f469":"woman","1f9d1":"person",
-  "1f44b":"wave","1f91a":"raised_back_of_hand","1f91b":"left-facing_fist","1f44c":"ok_hand","270c":"v",
-  "1f44d":"+1","1f44e":"-1","1f44f":"clap","1f91d":"handshake","1f64c":"raised_hands",
-  "1f595":"middle_finger","1f446":"point_up_2","1f447":"point_down","1f448":"point_left","1f449":"point_right",
-  "1f918":"call_me","1f44a":"fist","1f91c":"left-right_hand","1f9b5":"coat","1f9b8":"superhero",
-  "1f981":"lion","1f42f":"tiger","1f431":"cat","1f436":"dog","1f42d":"mouse","1f439":"hamster","1f430":"rabbit","1f98a":"fox_face",
-  "1f437":"pig","1f40d":"snake","1f354":"hamburger","1f355":"pizza","1f34e":"apple","1f37a":"beer","2615":"coffee",
-  "1f4bb":"computer","1f4f1":"iphone","1f4f7":"camera","1f4a1":"bulb","1f4b0":"moneybag","1f4c8":"chart_with_upwards_trend",
-  "1f3c6":"trophy","1f389":"tada","1f3b5":"musical_note","1f3c0":"basketball","1f3c8":"football","1f3c1":"checkered_flag"
+  "1f600":"grinning","1f602":"joy","1f603":"smiley","1f604":"smile","1f60a":"blush",
+  "1f60d":"heart_eyes","263a":"relaxed","1f44b":"wave","1f44d":"+1","1f64c":"raised_hands",
+  "1f4bb":"computer","1f4f1":"iphone","1f354":"hamburger","1f355":"pizza","1f37a":"beer"
 };
 
-/* Utilities */
-function loadJSON(k){ try{ const s = localStorage.getItem(k); return s ? JSON.parse(s) : null }catch(e){return null} }
-function saveJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)) }catch(e){} }
+/* utils */
+function safeParseJSON(s){ try{ return s ? JSON.parse(s) : null }catch(e){ return null } }
+function loadJSON(k){ try{ const s = localStorage.getItem(k); return safeParseJSON(s); }catch(e){ return null } }
+function saveJSON(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 function setStatus(t){ statusEl.textContent = 'Status: ' + t; }
 function applyFont(){ document.documentElement.style.setProperty('--size', (fontSize.value || 13) + 'px'); }
-function updateSortLabel(){ sortLabel.textContent = sortToggle.checked ? 'Newest first' : 'Oldest first'; }
 
-/* emoji map */
+/* sanitize token */
+function sanitizeToken(raw){
+  if(!raw) return '';
+  let t = String(raw).trim();
+  if((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))){
+    t = t.slice(1,-1).trim();
+  }
+  return t;
+}
+
+/* emoji map fetch */
 async function loadEmojiMap(token){
   const cached = loadJSON(EMOJI_MAP_KEY);
   if(cached){ emojiMap = cached; return emojiMap; }
@@ -288,21 +352,26 @@ async function loadEmojiMap(token){
     setStatus('Emoji map loaded.');
     return emojiMap;
   } catch(err){
-    console.warn('emoji map load failed', err);
     emojiMap = {};
-    setStatus('Emoji map unavailable; shortcodes may remain text.');
+    if(!emojiMapFailedShown){
+      emojiMapFailedShown = true;
+      setStatus('Emoji map unavailable — using Twemoji/shortcodes.');
+    }
+    console.warn('emoji map load failed', err);
     return emojiMap;
   }
 }
 
-/* escape and rendering */
+/* escape html */
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+/* render status with emoji handling */
 function renderStatus(style, text){
   const escaped = escapeHtml(text || '');
   const container = document.createElement('span');
   container.innerHTML = escaped;
 
+  // shortcodes replacement
   if(emojiMap){
     container.innerHTML = container.innerHTML.replace(/:([a-zA-Z0-9_+\-]+):/g, (m, code) => {
       if(emojiMap && emojiMap[code]) return `<img src="${escapeHtml(emojiMap[code])}" alt="${escapeHtml(m)}" class="emoji-img shortcode" />`;
@@ -311,9 +380,7 @@ function renderStatus(style, text){
   }
 
   if(style === 'twemoji'){
-    try{
-      twemoji.parse(container, { folder:'svg', ext:'.svg', callback: (icon) => `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/2/svg/${icon}.svg` });
-    } catch(e){ console.warn('twemoji.parse failed', e); }
+    try{ twemoji.parse(container, { folder:'svg', ext:'.svg', callback: (icon) => `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/2/svg/${icon}.svg` }); } catch(e){}
   } else if(style === 'github'){
     try{ twemoji.parse(container, { folder:'svg', ext:'.svg' }); } catch(e){}
     const imgs = Array.from(container.querySelectorAll('img'));
@@ -340,7 +407,7 @@ function renderStatus(style, text){
   return frag;
 }
 
-/* GraphQL */
+/* GraphQL helpers */
 function makeGraphQLRequest(query, variables, token){
   const headers = {'Content-Type':'application/json'};
   if(token) headers['Authorization'] = 'bearer ' + token;
@@ -367,7 +434,10 @@ async function fetchByList(usernames, token){
   const results = [];
   for(const chunk of chunks){
     let body = 'query {';
-    chunk.forEach((u,idx)=>{ const safe = u.replace(/[^a-zA-Z0-9_-]/g,''); body += `u${idx}: user(login: "${safe}") { login status { message emoji } avatarUrl url name } `; });
+    chunk.forEach((u,idx)=>{
+      const safe = u.replace(/[^a-zA-Z0-9_-]/g,'');
+      body += `u${idx}: user(login: "${safe}") { login status { message emoji } avatarUrl url name } `;
+    });
     body += '}';
     const res = await makeGraphQLRequest(body, {}, token);
     const data = res.data || {};
@@ -376,7 +446,7 @@ async function fetchByList(usernames, token){
   return results;
 }
 
-/* seen & observer */
+/* IntersectionObserver tuning */
 function loadSeenMap(){ return loadJSON(KEY_SEEN) || {}; }
 function saveSeenMap(m){ saveJSON(KEY_SEEN, m); }
 function createObserver(){
@@ -385,33 +455,38 @@ function createObserver(){
   observer = new IntersectionObserver(entries => {
     let changed = false;
     entries.forEach(entry => {
-      if(entry.isIntersecting){
-        const el = entry.target; const login = el.dataset.login; const fetchedAt = parseInt(el.dataset.fetchedAt || '0',10);
+      if(entry.isIntersecting && entry.intersectionRatio > 0.55){
+        const el = entry.target;
+        const login = el.dataset.login;
+        const fetchedAt = parseInt(el.dataset.fetchedAt || '0',10);
         if(!login) return;
         const prev = seenMap[login] ? parseInt(seenMap[login],10) : 0;
         if(fetchedAt && (!prev || fetchedAt > prev)){
-          seenMap[login] = Date.now(); changed = true;
-          const badge = el.querySelector('.badge.new'); if(badge) badge.remove();
+          seenMap[login] = Date.now();
+          changed = true;
+          // Removed New badge entirely — do not remove anything here
         }
       }
     });
     if(changed) saveSeenMap(seenMap);
-  }, { root: feedEl, threshold: 0.6 });
+  }, { root: feedEl, rootMargin: '0px 0px -20% 0px', threshold: [0.55] });
   return observer;
 }
 
-/* render */
-function isNewForLogin(login, fetchedAt){
-  const seen = loadSeenMap();
-  const prev = seen[login] ? parseInt(seen[login],10) : 0;
-  return !prev || (fetchedAt > prev);
+/* render feed items, filtering blank statuses */
+function isActiveStatus(s){
+  if(!s) return false;
+  const m = String(s.message || '').trim();
+  const e = String(s.emoji || '').trim();
+  return (m.length > 0) || (e.length > 0);
 }
-function formatTimestamp(ms){ try{ return new Date(Number(ms)).toLocaleString(); }catch(e){return ''} }
 function applySortOrder(users){ return sortToggle.checked ? users.slice().reverse() : users.slice(); }
 
 function render(users){
-  const filtered = (users || []).filter(u => u && u.status && ((u.status.message && u.status.message.trim()) || (u.status.emoji && u.status.emoji.trim())));
-  currentUsers = filtered; userMap = new Map(); currentUsers.forEach(u => { if(u && u.login) userMap.set(String(u.login).toLowerCase(), u); });
+  const filtered = (users || []).filter(u => u && isActiveStatus(u.status));
+  currentUsers = filtered;
+  userMap = new Map();
+  currentUsers.forEach(u => { if(u && u.login) userMap.set(String(u.login).toLowerCase(), u); });
 
   const toRender = applySortOrder(currentUsers);
   if(observer) observer.disconnect();
@@ -427,11 +502,12 @@ function render(users){
   toRender.forEach(u => {
     const login = (u.login || '').toLowerCase();
     const fetchedAt = u._fetchedAt || Date.now();
-    const isNew = isNewForLogin(login, fetchedAt);
+    // new detection still saved in seen map, but we no longer display a badge in the UI
 
     const card = document.createElement('div');
-    card.className = 'card' + (isNew ? ' new-pulse' : '');
-    card.dataset.login = login; card.dataset.fetchedAt = String(fetchedAt);
+    card.className = 'card';
+    card.dataset.login = login;
+    card.dataset.fetchedAt = String(fetchedAt);
 
     const metaRow = document.createElement('div'); metaRow.className = 'meta-row';
     const left = document.createElement('div'); left.className = 'meta-left';
@@ -440,6 +516,7 @@ function render(users){
     const avatarLink = document.createElement('a');
     avatarLink.href = profileUrl; avatarLink.target = '_blank'; avatarLink.rel = 'noopener noreferrer';
     avatarLink.className = 'user-link'; avatarLink.setAttribute('aria-label', u.login ? `View ${u.login} on GitHub` : 'View profile');
+    avatarLink.setAttribute('role','link'); avatarLink.setAttribute('tabindex','0');
     avatarLink.addEventListener('click', e => e.stopPropagation());
 
     const avatar = document.createElement('img'); avatar.className = 'avatar'; avatar.src = u.avatarUrl || ''; avatar.alt = u.login ? `@${u.login}` : 'avatar';
@@ -447,7 +524,8 @@ function render(users){
 
     const nameLink = document.createElement('a');
     nameLink.href = profileUrl; nameLink.target = '_blank'; nameLink.rel = 'noopener noreferrer';
-    nameLink.className = 'user-link'; nameLink.addEventListener('click', e => e.stopPropagation());
+    nameLink.className = 'user-link'; nameLink.setAttribute('role','link'); nameLink.setAttribute('tabindex','0');
+    nameLink.addEventListener('click', e => e.stopPropagation());
 
     const nameRow = document.createElement('div'); nameRow.className = 'name-row';
     const displayName = document.createElement('div'); displayName.className = 'display-name'; displayName.textContent = u.name || u.login || 'unknown';
@@ -456,18 +534,19 @@ function render(users){
     nameLink.appendChild(nameRow); left.appendChild(nameLink);
 
     const right = document.createElement('div'); right.className = 'meta-right';
-    const ts = document.createElement('div'); ts.className = 'timestamp'; ts.textContent = formatTimestamp(fetchedAt); right.appendChild(ts);
-
-    if(isNew){ const badge = document.createElement('div'); badge.className = 'badge new'; badge.textContent='New'; right.appendChild(badge); }
+    // removed New badge from right side entirely
 
     metaRow.appendChild(left); metaRow.appendChild(right); card.appendChild(metaRow);
 
     if(u.status && (u.status.message || u.status.emoji)){
-      const parts = []; if(u.status.emoji) parts.push(u.status.emoji); if(u.status.message) parts.push(u.status.message);
+      const parts = [];
+      if(u.status.emoji) parts.push(u.status.emoji);
+      if(u.status.message) parts.push(u.status.message);
       const combined = parts.join(' ').trim();
       const statusDiv = document.createElement('div'); statusDiv.className = 'status';
       const frag = renderStatus((emojiStyleSelect && emojiStyleSelect.value) ? emojiStyleSelect.value : 'twemoji', combined);
-      statusDiv.appendChild(frag); card.appendChild(statusDiv);
+      statusDiv.appendChild(frag);
+      card.appendChild(statusDiv);
     } else {
       const p = document.createElement('div'); p.className = 'no-status'; p.textContent = 'No status set'; card.appendChild(p);
     }
@@ -480,22 +559,55 @@ function render(users){
   createObserver();
   const cards = feedEl.querySelectorAll('.card[data-login]');
   cards.forEach(c => observer.observe(c));
-  restoreScrollTop();
+
+  requestAnimationFrame(()=> restoreScrollTop());
 }
 
 /* mark seen */
-function markSeenForLogin(login){ try{ const m = loadSeenMap(); m[login] = Date.now(); saveSeenMap(m); const el = feedEl.querySelector(`[data-login="${login}"]`); if(el){ const b = el.querySelector('.badge.new'); if(b) b.remove(); } } catch(e){ console.warn(e); } }
+function markSeenForLogin(login){ try{ const m = loadSeenMap(); m[login] = Date.now(); saveSeenMap(m); } catch(e){ console.warn(e); } }
 
-/* scroll preserve */
-function saveScrollTop(){ try{ sessionStorage.setItem(SCROLL_KEY, String(feedEl.scrollTop || 0)); }catch(e){} }
-function restoreScrollTop(){ try{ const raw = sessionStorage.getItem(SCROLL_KEY); if(!raw) return; const y = parseInt(raw,10); requestAnimationFrame(()=> feedEl.scrollTop = y); }catch(e){} }
+/* scroll persistence */
+function saveScrollTop(source){
+  try{
+    const payload = { scrollTop: feedEl.scrollTop || 0, ts: Date.now(), source: source || null };
+    sessionStorage.setItem(SCROLL_KEY, JSON.stringify(payload));
+  }catch(e){}
+}
+function restoreScrollTop(){
+  try{
+    const raw = sessionStorage.getItem(SCROLL_KEY);
+    if(!raw) return;
+    const obj = safeParseJSON(raw);
+    if(!obj || !obj.ts) return;
+    const age = Date.now() - obj.ts;
+    if(age > 1000 * 60 * 5) return;
+    const y = parseInt(obj.scrollTop || '0',10);
+    requestAnimationFrame(()=> {
+      setTimeout(()=> {
+        const max = Math.max(0, feedEl.scrollHeight - feedEl.clientHeight);
+        feedEl.scrollTop = Math.min(y, max);
+      }, 60);
+    });
+  }catch(e){}
+}
+
+/* feed height */
+function adjustFeedHeight(){
+  const mobile = window.matchMedia('(max-width:900px)').matches;
+  if(mobile){ feedEl.style.maxHeight = ''; return; }
+  const headerRect = headerEl.getBoundingClientRect();
+  const composerRect = composerEl.getBoundingClientRect();
+  const padding = 28;
+  const available = Math.max(200, window.innerHeight - Math.ceil(headerRect.height + composerRect.height + padding));
+  feedEl.style.maxHeight = available + 'px';
+}
 
 /* fetch flow */
 async function runFetch(){
-  const token = tokenInput.value.trim();
+  const token = sanitizeToken(tokenInput.value || '');
   if(token) warn.classList.remove('hidden');
   setStatus('fetching...');
-  saveScrollTop();
+  saveScrollTop('fetch');
   refreshBtn.disabled = true; applySettings.disabled = true;
   try{
     await loadEmojiMap(token || undefined);
@@ -513,7 +625,7 @@ async function runFetch(){
       users = resp.filter(Boolean).map(x=>({ login: x.login, status: x.status, name: x.name, url: x.url, avatarUrl: x.avatarUrl, _fetchedAt: Date.now() }));
     }
 
-    const activeOnly = users.filter(u => u && u.status && ((u.status.message && u.status.message.trim()) || (u.status.emoji && u.status.emoji.trim())));
+    const activeOnly = users.filter(u => u && u.status && ((u.status.message && String(u.status.message).trim()) || (u.status.emoji && String(u.status.emoji).trim())));
     render(activeOnly);
     setStatus('Feed updated. Displaying ' + activeOnly.length + ' active statuses.');
   } catch(err){
@@ -529,13 +641,14 @@ async function jumpToUsername(raw){
   const username = String(raw || '').trim().replace(/^@/,'');
   if(!username){ setStatus('Enter a username to jump to.'); return; }
   const lookup = username.toLowerCase();
+  saveScrollTop('jump');
   if(userMap.has(lookup)){
     const el = feedEl.querySelector(`[data-login="${lookup}"]`);
-    if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); triggerHighlight(el); markSeenForLogin(lookup); setStatus('Jumped to @' + username); return; }
+    if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); if(_highlightTimer) clearTimeout(_highlightTimer); _highlightTimer = setTimeout(()=> { triggerHighlight(el); markSeenForLogin(lookup); _highlightTimer = null; }, 160); setStatus('Jumped to @' + username); return; }
   }
   setStatus('Fetching ' + username + '...');
   try{
-    const token = tokenInput.value.trim();
+    const token = sanitizeToken(tokenInput.value || '');
     await loadEmojiMap(token || undefined);
     const res = await fetchByList([username], token || undefined);
     if(!res || !res[0] || !res[0].login){ setStatus('User not found: ' + username); return; }
@@ -549,13 +662,15 @@ async function jumpToUsername(raw){
     else { const idx = currentUsers.findIndex(x => x.login && x.login.toLowerCase() === u.login.toLowerCase()); if(idx !== -1) currentUsers[idx] = u; }
     render(currentUsers);
     const el = feedEl.querySelector(`[data-login="${u.login.toLowerCase()}"]`);
-    if(el){ setTimeout(()=> { el.scrollIntoView({behavior:'smooth', block:'center'}); triggerHighlight(el); }, 80); }
-    setStatus('Fetched & jumped to @' + u.login); markSeenForLogin(u.login.toLowerCase());
+    if(el){
+      setTimeout(()=> { el.scrollIntoView({behavior:'smooth', block:'center'}); if(_highlightTimer) clearTimeout(_highlightTimer); _highlightTimer = setTimeout(()=> { triggerHighlight(el); markSeenForLogin(u.login.toLowerCase()); _highlightTimer = null; }, 160); }, 120);
+    }
+    setStatus('Fetched & jumped to @' + u.login);
   } catch(err){ console.error(err); setStatus('Error fetching user: ' + (err.message || err)); }
 }
 
-/* highlight */
-function triggerHighlight(el){ if(!el) return; el.classList.remove('highlight'); void el.offsetWidth; el.classList.add('highlight'); setTimeout(()=> el.classList.remove('highlight'), 1100); }
+/* highlight helper */
+function triggerHighlight(el){ if(!el) return; el.classList.remove('highlight'); void el.offsetWidth; el.classList.add('highlight'); setTimeout(()=> el.classList.remove('highlight'), 1000); }
 
 /* settings persistence */
 function loadState(){
@@ -577,45 +692,66 @@ function loadState(){
 }
 function saveState(){
   const obj = { count: countInput.value, mode: queryType.value, userlist: userList.value, font: fontSize.value, sortNewest: !!sortToggle.checked, emojiStyle: emojiStyleSelect.value, remember: !!rememberToken.checked };
-  if(rememberToken.checked && tokenInput.value.trim()){ obj.token = tokenInput.value.trim(); }
+  if(rememberToken.checked){
+    const tok = sanitizeToken(tokenInput.value || '');
+    if(tok) obj.token = tok;
+  }
   saveJSON(STORAGE_KEY, obj);
 }
 
-/* tooltip accessible behavior */
-function showTooltip(){
-  rememberTip.classList.add('visible'); rememberTip.setAttribute('aria-hidden','false'); infoBtn.setAttribute('aria-expanded','true');
+/* clear stored token */
+function clearStoredToken(){
+  const s = loadJSON(STORAGE_KEY) || {};
+  delete s.token;
+  s.remember = false;
+  saveJSON(STORAGE_KEY, s);
 }
-function hideTooltip(){
-  rememberTip.classList.remove('visible'); rememberTip.setAttribute('aria-hidden','true'); infoBtn.setAttribute('aria-expanded','false');
-}
-infoBtn.addEventListener('mouseenter', showTooltip);
-infoBtn.addEventListener('mouseleave', hideTooltip);
-infoBtn.addEventListener('focus', showTooltip);
-infoBtn.addEventListener('blur', hideTooltip);
-infoBtn.addEventListener('click', (e)=>{ const visible = rememberTip.classList.contains('visible'); if(visible) hideTooltip(); else showTooltip(); e.stopPropagation(); });
-document.addEventListener('click', (e)=>{ if(!rememberTip.contains(e.target) && e.target !== infoBtn) hideTooltip(); });
 
-/* events */
-document.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key==='r'){ e.preventDefault(); saveScrollTop(); runFetch(); } if(e.key==='Enter' && document.activeElement === composerInput){ e.preventDefault(); jumpBtn.click(); }});
-refreshBtn.addEventListener('click', ()=>{ saveScrollTop(); runFetch(); });
-applySettings.addEventListener('click', ()=>{ applyFont(); saveState(); saveScrollTop(); runFetch(); });
-resetSettings.addEventListener('click', ()=>{ localStorage.removeItem(STORAGE_KEY); tokenInput.value=''; rememberToken.checked=false; countInput.value=50; queryType.value='search'; userList.value=''; fontSize.value=13; sortToggle.checked=true; emojiStyleSelect.value='twemoji'; userListLabel.classList.add('hidden'); warn.classList.add('hidden'); applyFont(); updateSortLabel(); setStatus('Settings reset.'); });
-clearTokenBtn.addEventListener('click', ()=>{ tokenInput.value=''; rememberToken.checked=false; const s = loadJSON(STORAGE_KEY)||{}; delete s.token; s.remember = false; saveJSON(STORAGE_KEY,s); warn.classList.add('hidden'); setStatus('Token cleared.'); });
+/* events wiring */
+function updateSortLabel(){ sortLabel.textContent = sortToggle.checked ? 'Newest first' : 'Oldest first'; }
+
+document.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey||e.metaKey) && e.key==='r'){ e.preventDefault(); saveScrollTop('manual-refresh'); runFetch(); }
+  if(e.key==='Enter' && document.activeElement === composerInput){ e.preventDefault(); jumpBtn.click(); }
+});
+
+refreshBtn.addEventListener('click', ()=>{ saveScrollTop('manual-refresh'); runFetch(); });
+applySettings.addEventListener('click', ()=>{ applyFont(); saveState(); saveScrollTop('apply-settings'); adjustFeedHeight(); runFetch(); });
+resetSettings.addEventListener('click', ()=>{ localStorage.removeItem(STORAGE_KEY); tokenInput.value=''; rememberToken.checked=false; countInput.value=50; queryType.value='search'; userList.value=''; fontSize.value=13; sortToggle.checked=true; emojiStyleSelect.value='twemoji'; userListLabel.classList.add('hidden'); warn.classList.add('hidden'); applyFont(); updateSortLabel(); setStatus('Settings reset.'); clearStoredToken(); });
+clearTokenBtn.addEventListener('click', ()=>{ tokenInput.value=''; rememberToken.checked=false; clearStoredToken(); warn.classList.add('hidden'); setStatus('Token cleared.'); });
 queryType.addEventListener('change', ()=> userListLabel.classList.toggle('hidden', queryType.value !== 'fromList'));
-fontSize.addEventListener('change', applyFont);
+fontSize.addEventListener('change', ()=>{ applyFont(); adjustFeedHeight(); });
 jumpBtn.addEventListener('click', ()=> jumpToUsername(composerInput.value));
-sortToggle.addEventListener('change', ()=>{ updateSortLabel(); saveState(); saveScrollTop(); render(currentUsers); });
-emojiStyleSelect.addEventListener('change', ()=> { saveState(); });
+sortToggle.addEventListener('change', ()=>{ updateSortLabel(); saveState(); saveScrollTop('sort-change'); render(currentUsers); });
+emojiStyleSelect.addEventListener('change', ()=> { saveState(); render(currentUsers); });
 
-/* initial */
+/* keyboard support for the label that visually matches the Jump button */
+sortControlLabel.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sortToggle.checked = !sortToggle.checked; sortToggle.dispatchEvent(new Event('change')); } });
+sortControlLabel.addEventListener('click', (e)=>{ if(e.target.tagName.toLowerCase() === 'input') return; sortToggle.checked = !sortToggle.checked; sortToggle.dispatchEvent(new Event('change')); });
+
+window.addEventListener('resize', debounce(()=> { adjustFeedHeight(); }, 120));
+window.addEventListener('orientationchange', ()=> setTimeout(adjustFeedHeight, 140));
+
+/* debounce */
+function debounce(fn, wait){
+  let t = null; return function(...a){ clearTimeout(t); t = setTimeout(()=> fn.apply(this,a), wait); };
+}
+
+/* init */
 loadState();
-runFetch();
+applyFont();
+setTimeout(()=>{ adjustFeedHeight(); runFetch(); }, 60);
 
-/* helpers */
-function saveScrollTop(){ try{ sessionStorage.setItem(SCROLL_KEY, String(feedEl.scrollTop || 0)); }catch(e){} }
-function restoreScrollTop(){ try{ const raw = sessionStorage.getItem(SCROLL_KEY); if(!raw) return; const y = parseInt(raw,10); requestAnimationFrame(()=> feedEl.scrollTop = y); }catch(e){} }
-
+/* expose basic API */
 window._ghfeed = { runFetch, jumpToUsername, loadEmojiMap, CODEPOINT_TO_SHORTCODE };
+
+/* small helpers (copied where needed) */
+function safeParseJSON(s){ try{ return s ? JSON.parse(s) : null }catch(e){ return null } }
+function saveScrollTop(source){ try{ const payload = { scrollTop: feedEl.scrollTop || 0, ts: Date.now(), source: source || null }; sessionStorage.setItem(SCROLL_KEY, JSON.stringify(payload)); }catch(e){} }
+function restoreScrollTop(){ try{ const raw = sessionStorage.getItem(SCROLL_KEY); if(!raw) return; const obj = safeParseJSON(raw); if(!obj || !obj.ts) return; const age = Date.now() - obj.ts; if(age > 1000 * 60 * 5) return; const y = parseInt(obj.scrollTop || '0',10); requestAnimationFrame(()=> { setTimeout(()=> { const max = Math.max(0, feedEl.scrollHeight - feedEl.clientHeight); feedEl.scrollTop = Math.min(y, max); }, 60); }); }catch(e){} }
+function loadSeenMap(){ return loadJSON(KEY_SEEN) || {}; }
+function saveSeenMap(m){ saveJSON(KEY_SEEN, m); }
+
 </script>
 </body>
 </html>
