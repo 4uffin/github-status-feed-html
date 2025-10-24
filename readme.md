@@ -7,19 +7,24 @@ It's designed to be a lightweight tool for quickly checking the presence status 
 ## **✨ Features**
 
 * **Real-time Status Feed:** Displays the current public status (emoji and message) for a list of GitHub users.  
+
 * **Two Query Modes:**  
-  1. **Search:** Fetch the latest active statuses from the top N users on GitHub.  
+
+  1. **Search:** Fetch the latest active statuses from the top N users on GitHub.
+   
   2. **List:** Fetch statuses for a specific, comma-separated list of usernames.  
+
 * **Personal Access Token (PAT) Support:** Optionally paste a GitHub Personal Access Token to increase the API rate limit, allowing for more frequent or larger data fetches.  
+
 * **Token Persistence:** Option to securely save the PAT locally in your browser's **LocalStorage** for future sessions.  
+
 * **Jump Functionality:** Quickly fetch and highlight the status of a specific user.  
+
 * **Responsive Design:** Optimized for viewing on both desktop and mobile devices.  
+
 * **Emoji Control:** Select between **Twemoji** (consistent, cross-platform images) or **GitHub's** default emoji image style.  
+
 * **Client-Side Configuration:** Easily adjust the fetch count, query type, and display settings (like font size and sort order) via the settings panel.
-
-## **📸 Visual Preview**
-
-\[**PLACEHOLDER:** Insert a screenshot or GIF of the client running here to show the feed and settings panel.\]
 
 ## **🚀 How to Use**
 
@@ -29,7 +34,7 @@ Since this is a single HTML file, you can run it directly in any modern web brow
 
 * A modern web browser (Chrome, Firefox, Edge, Safari, etc.).  
 * An active internet connection to reach the GitHub GraphQL API.  
-* (Optional, but recommended) A GitHub Personal Access Token (PAT) for higher rate limits.
+* A GitHub Personal Access Token (PAT) for higher rate limits.
 
 ### **Running the Client**
 
@@ -46,7 +51,7 @@ The application is highly configurable via the **Settings Panel** on the right (
 | **Remember token** | Check this to save the token securely in your browser's LocalStorage. | Off |
 | **Users to fetch** | The number of users to fetch when using the **Search** query type (max 500). | 50 |
 | **Query type** | Toggle between **Search** (fetch top N users) and **Fetch by username list** (use the list below). | Search |
-| **Comma-separated usernames** | Enter a list of specific GitHub logins (e.g., octocat,torvalds) when using the **Fetch by username list** mode. | Empty |
+| **Comma-separated usernames** | Enter a list of specific GitHub logins (e.g., octocat, torvalds) when using the **Fetch by username list** mode. | Empty |
 | **Emoji style** | Choose how emojis are rendered (Twemoji vs. GitHub style). | Twemoji |
 | **Font size** | Adjust the display font size for the entire application. | 13 |
 
@@ -58,7 +63,7 @@ Using a PAT is the best way to avoid GitHub's strict API rate limits. You only n
 
 **Crucial Note:** Treat your PAT like a password. It should never be shared publicly or committed to source code.
 
-### **1\. Navigate to Settings**
+### **1. Navigate to Settings**
 
 1. Log in to your GitHub account.  
 2. Click on your **profile photo** in the upper-right corner.  
@@ -67,34 +72,20 @@ Using a PAT is the best way to avoid GitHub's strict API rate limits. You only n
 5. In the next left sidebar, click **Personal access tokens**.  
 6. Click **Tokens (classic)**.
 
-### **2\. Generate and Configure the Token**
+### **2. Generate and Configure the Token**
 
 1. Click the **Generate new token (classic)** button.  
 2. Set the **Note** to something descriptive (e.g., Status Feed Client).  
 3. Set an **Expiration** date (for security, or select No expiration for simplicity).  
 4. Under **Select scopes**, **ONLY** check the **read:user** checkbox. This is the only permission needed for this client. **Do not check repo or other powerful scopes.**
 
-### **3\. Create and Copy**
+### **3. Create and Copy**
 
 1. Click the **Generate token** button at the bottom of the page.  
 2. **IMMEDIATELY COPY THE GENERATED TOKEN.** You will not be able to see it again once you leave the page.
 
 You can now paste this token into the "GitHub Token" field in the client's Settings Panel.
 
-## **🤝 Contributing**
-
-Since this is an open-source project under the MIT license, contributions are welcome\!
-
-1. **Fork** the repository.  
-2. **Create** your feature branch (git checkout \-b feature/AmazingFeature).  
-3. **Commit** your changes (git commit \-m 'Add some AmazingFeature').  
-4. **Push** to the branch (git push origin feature/AmazingFeature).  
-5. **Open a Pull Request.**
-
-For bug fixes or simple suggestions, feel free to open an **Issue** on the repository.
-
 ## **📜 License**
 
-This project is licensed under the **MIT License**.
-
-The MIT License is a short, permissive software license. The license permits reuse for any purpose, commercial or otherwise, without requiring publication of the source code.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE).
