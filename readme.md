@@ -1,3 +1,6 @@
+> [!Tip]
+> Want to spice up your status for the feed? Check out my new project, [random-github-status](https://github.com/4uffin/random-github-status)
+
 # **GitHub Status Feed Client**
 
 This is a single-file, responsive web application built with **HTML, CSS, and vanilla JavaScript** that allows you to view the current status messages of various GitHub users in a clean, scrollable feed.
